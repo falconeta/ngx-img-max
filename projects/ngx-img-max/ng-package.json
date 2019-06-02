@@ -5,6 +5,8 @@
     "entryFile": "src/public-api.ts"
   },
   "whitelistedNonPeerDependencies": [
-    "ng2-pica"
+    "ngx-pica",
+    "pica",
+    "exif-js"
   ]
 }

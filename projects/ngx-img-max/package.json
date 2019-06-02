@@ -1,12 +1,16 @@
 {
   "name": "ngx-img-max",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "dependencies": {
-    "ng2-pica": "^1.2.12"
+    "exif-js": "^2.3.0",
+    "ng-pica": "^8.0.0",
+    "pica": "^5.0.0"
   },
   "peerDependencies": {
     "@angular/common": "^8.0.0",
     "@angular/core": "^8.0.0",
-    "ng2-pica": "^1.2.12"
+    "exif-js": "^2.3.0",
+    "ng-pica": "^8.0.0",
+    "pica": "^5.0.0"
   }
 }

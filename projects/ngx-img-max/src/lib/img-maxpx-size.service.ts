@@ -1,8 +1,8 @@
 import { Injectable, Inject, forwardRef } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
-import { Ng2PicaService } from 'ng2-pica';
 
 import { ImgExifService } from './img-exif.service';
+import { NgxPicaService } from 'ng-pica';
 
 export interface ImageData {
   img: HTMLImageElement;
@@ -16,7 +16,7 @@ export interface ImageData {
 export class ImgMaxPXSizeService {
   timeAtStart: number;
   constructor(
-    @Inject(forwardRef(() => Ng2PicaService)) private ng2PicaService: Ng2PicaService,
+    @Inject(forwardRef(() => NgxPicaService)) private ngxPicaService: NgxPicaService,
     @Inject(forwardRef(() => ImgExifService)) private imageExifService: ImgExifService
   ) {}
   public resizeImage(file: File, maxWidth: number, maxHeight: number, logExecutionTime: boolean = false): Observable<any> {
@@ -73,7 +73,7 @@ export class ImgMaxPXSizeService {
         resizedFileSubject.next(file);
         this.logExecutionTime(logExecutionTime);
       } else {
-        this.ng2PicaService.resize([file], newWidth, newHeight).subscribe(
+        this.ngxPicaService.resizeImages([file], newWidth, newHeight).subscribe(
           result => {
             // all good, result is a file
             resizedFileSubject.next(result);
