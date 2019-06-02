@@ -10,9 +10,11 @@ export class NgxImgMaxService {
     @Inject(forwardRef(() => ImgMaxSizeService)) private imgMaxSizeService: ImgMaxSizeService,
     @Inject(forwardRef(() => ImgMaxPXSizeService)) private imgMaxPXSizeService: ImgMaxPXSizeService,
     @Inject(forwardRef(() => ImgExifService)) private imageExifService: ImgExifService
-  ) {}
+  ) {
+    console.log('-------------------------------------------------------- version 7');
+  }
   public compress(files: File[], maxSizeInMB: number, ignoreAlpha: boolean = false, logExecutionTime: boolean = false): Observable<any> {
-    let compressedFileSubject: Subject<any> = new Subject<any>();
+    const compressedFileSubject = new Subject<any>();
     files.forEach(file => {
       this.compressImage(file, maxSizeInMB, ignoreAlpha, logExecutionTime).subscribe(
         value => {
@@ -26,7 +28,7 @@ export class NgxImgMaxService {
     return compressedFileSubject.asObservable();
   }
   public resize(files: File[], maxWidth: number, maxHeight: number, logExecutionTime: boolean = false): Observable<any> {
-    let resizedFileSubject: Subject<any> = new Subject<any>();
+    const resizedFileSubject = new Subject<any>();
     files.forEach(file => {
       this.resizeImage(file, maxWidth, maxHeight, logExecutionTime).subscribe(
         value => {

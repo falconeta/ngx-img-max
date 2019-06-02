@@ -12,10 +12,10 @@ import { Ng2PicaModule } from 'ng2-pica';
   ],
   exports: [],
   providers: [
-    { provide: ImgMaxPXSizeService, useClass: ImgMaxPXSizeService },
-    { provide: ImgMaxSizeService, useClass: ImgMaxSizeService },
-    { provide: ImgExifService, useClass: ImgExifService },
-    { provide: NgxImgMaxService, useClass: NgxImgMaxService }
+    ImgMaxPXSizeService,
+    ImgMaxSizeService,
+    ImgExifService,
+    NgxImgMaxService
   ]
 })
 export class NgxImgMaxModule {}
