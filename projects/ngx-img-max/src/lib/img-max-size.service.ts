@@ -1,7 +1,7 @@
-import { Injectable, Inject, forwardRef } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
-
 import { ImgExifService } from './img-exif.service';
+
 
 const MAX_STEPS = 15;
 // declare var self: any;
@@ -20,7 +20,7 @@ export interface ImageSizeData {
 export class ImgMaxSizeService {
   timeAtStart: number;
   initialFile: File;
-  constructor(@Inject(forwardRef(() => ImgExifService)) private imageExifService: ImgExifService) {}
+  constructor(private imageExifService: ImgExifService) {}
   public compressImage(file: File, maxSizeInMB: number, ignoreAlpha: boolean = false, logExecutionTime: boolean = false): Observable<any> {
     const compressedFileSubject = new Subject<any>();
     this.timeAtStart = new Date().getTime();
@@ -65,30 +65,30 @@ export class ImgMaxSizeService {
     const { img, cvs, file, ignoreAlpha, compressedFileSubject, maxSizeInMB, logExecutionTime } = imageSizeData;
     let { ctx } = imageSizeData;
     this.imageExifService.getOrientedImage(img).then(orientedImg => {
-      window.URL.revokeObjectURL(img.src);
-      cvs.width = orientedImg.width;
-      cvs.height = orientedImg.height;
-      ctx.drawImage(orientedImg, 0, 0);
-      const imageData = ctx.getImageData(0, 0, orientedImg.width, orientedImg.height);
-      if (file.type === 'image/png' && this.isImgUsingAlpha(imageData) && !ignoreAlpha) {
-        // png image with alpha
-        compressedFileSubject.error({
-          compressedFile: file,
-          reason: 'File provided is a png image which uses the alpha channel. No compression possible.',
-          error: 'PNG_WITH_ALPHA'
-        });
-      }
-      ctx = cvs.getContext('2d', { alpha: false });
-      ctx.drawImage(orientedImg, 0, 0);
-      this.getCompressedFile(cvs, 50, maxSizeInMB, 1)
-        .then(compressedFile => {
-          compressedFileSubject.next(compressedFile);
-          this.logExecutionTime(logExecutionTime);
-        })
-        .catch(error => {
-          compressedFileSubject.error(error);
-          this.logExecutionTime(logExecutionTime);
-        });
+    window.URL.revokeObjectURL(img.src);
+    cvs.width = orientedImg.width;
+    cvs.height = orientedImg.height;
+    ctx.drawImage(orientedImg, 0, 0);
+    const imageData = ctx.getImageData(0, 0, orientedImg.width, orientedImg.height);
+    if (file.type === 'image/png' && this.isImgUsingAlpha(imageData) && !ignoreAlpha) {
+      // png image with alpha
+      compressedFileSubject.error({
+        compressedFile: file,
+        reason: 'File provided is a png image which uses the alpha channel. No compression possible.',
+        error: 'PNG_WITH_ALPHA'
+      });
+    }
+    ctx = cvs.getContext('2d', { alpha: false });
+    ctx.drawImage(orientedImg, 0, 0);
+    this.getCompressedFile(cvs, 50, maxSizeInMB, 1)
+      .then(compressedFile => {
+        compressedFileSubject.next(compressedFile);
+        this.logExecutionTime(logExecutionTime);
+      })
+      .catch(error => {
+        compressedFileSubject.error(error);
+        this.logExecutionTime(logExecutionTime);
+      });
     });
   }
 

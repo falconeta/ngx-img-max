@@ -1,33 +1,27 @@
-import { Injectable, Inject, forwardRef } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { Observable, Subject, throwError } from 'rxjs';
 
+import { NgxPicaService, NgxPicaResizeOptionsInterface } from 'ng-pica';
 import { ImgExifService } from './img-exif.service';
-import { NgxPicaService } from 'ng-pica';
 
 export interface ImageData {
   img: HTMLImageElement;
   file: File;
   maxWidth: number;
   maxHeight: number;
-  resizedFileSubject: Subject<any>;
+  resizedFileSubject: Subject<File>;
   logExecutionTime: boolean;
 }
 @Injectable()
 export class ImgMaxPXSizeService {
   timeAtStart: number;
-  constructor(
-    @Inject(forwardRef(() => NgxPicaService)) private ngxPicaService: NgxPicaService,
-    @Inject(forwardRef(() => ImgExifService)) private imageExifService: ImgExifService
-  ) {}
-  public resizeImage(file: File, maxWidth: number, maxHeight: number, logExecutionTime: boolean = false): Observable<any> {
-    const resizedFileSubject = new Subject<any>();
+  constructor(private ngxPicaService: NgxPicaService, private imageExifService: ImgExifService) {}
+  public resizeImage(file: File, maxWidth: number, maxHeight: number, logExecutionTime: boolean = false): Observable<File> {
+    const resizedFileSubject = new Subject<File>();
     this.timeAtStart = new Date().getTime();
     if (file.type !== 'image/jpeg' && file.type !== 'image/png') {
       // END OF RESIZE
-      setTimeout(() => {
-        resizedFileSubject.error({ resizedFile: file, reason: 'The provided File is neither of type jpg nor of type png.', error: 'INVALID_EXTENSION' });
-      }, 0);
-      return resizedFileSubject.asObservable();
+      return throwError({ resizedFile: file, reason: 'The provided File is neither of type jpg nor of type png.', error: 'INVALID_EXTENSION' });
     }
     const img = new Image();
     // let self = this;
@@ -73,18 +67,21 @@ export class ImgMaxPXSizeService {
         resizedFileSubject.next(file);
         this.logExecutionTime(logExecutionTime);
       } else {
-        this.ngxPicaService.resizeImages([file], newWidth, newHeight).subscribe(
-          result => {
+        const options: NgxPicaResizeOptionsInterface = {
+          alpha: true
+        };
+        this.ngxPicaService.resizeImage(file, newWidth, newHeight, options).subscribe({
+          next: result => {
             // all good, result is a file
             resizedFileSubject.next(result);
             this.logExecutionTime(logExecutionTime);
           },
-          error => {
+          error: error => {
             // something went wrong
             resizedFileSubject.error({ resizedFile: file, reason: error, error: 'PICA_ERROR' });
             this.logExecutionTime(logExecutionTime);
           }
-        );
+        });
       }
     });
   }
