@@ -1,5 +1,5 @@
 import { Subject, Observable } from 'rxjs';
-import { ImageConfig } from './img-max.interfaces';
+import { ImageConfig, ImageError } from './img-max.interfaces';
 
 export class ImageQueueItem {
   private resizeSubject: Subject<File>;
@@ -22,6 +22,11 @@ export class ImageQueueItem {
 
   public set resizeSub(imageResized: File) {
     this.resizeSubject.next(imageResized);
+    this.resizeSubject.complete();
+  }
+
+  public set resizeSubError(error: ImageError) {
+    this.resizeSubject.error(error);
     this.resizeSubject.complete();
   }
 }

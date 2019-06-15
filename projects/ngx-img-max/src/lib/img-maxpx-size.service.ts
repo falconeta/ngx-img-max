@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject, throwError } from 'rxjs';
+import { take, finalize } from 'rxjs/operators';
 
 import { NgxPicaService, NgxPicaResizeOptionsInterface } from 'ng-pica';
 import { ImgExifService } from './img-exif.service';
@@ -65,23 +66,30 @@ export class ImgMaxPXSizeService {
       if (newHeight === orientedImg.height && newWidth === orientedImg.width) {
         // no resizing necessary
         resizedFileSubject.next(file);
+        resizedFileSubject.complete();
         this.logExecutionTime(logExecutionTime);
       } else {
         const options: NgxPicaResizeOptionsInterface = {
           alpha: true
         };
-        this.ngxPicaService.resizeImage(file, newWidth, newHeight, options).subscribe({
-          next: result => {
-            // all good, result is a file
-            resizedFileSubject.next(result);
-            this.logExecutionTime(logExecutionTime);
-          },
-          error: error => {
-            // something went wrong
-            resizedFileSubject.error({ resizedFile: file, reason: error, error: 'PICA_ERROR' });
-            this.logExecutionTime(logExecutionTime);
-          }
-        });
+        this.ngxPicaService
+          .resizeImage(file, newWidth, newHeight, options)
+          .pipe(
+            take(1),
+            finalize(() => resizedFileSubject.complete())
+          )
+          .subscribe({
+            next: result => {
+              // all good, result is a file
+              resizedFileSubject.next(result);
+              this.logExecutionTime(logExecutionTime);
+            },
+            error: error => {
+              // something went wrong
+              resizedFileSubject.error({ resizedFile: file, reason: error, error: 'PICA_ERROR' });
+              this.logExecutionTime(logExecutionTime);
+            }
+          });
       }
     });
   }

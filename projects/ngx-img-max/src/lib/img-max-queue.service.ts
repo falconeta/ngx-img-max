@@ -4,10 +4,10 @@ import { ImgMaxPXSizeService } from './img-maxpx-size.service';
 import { ConversionProgress } from '../public-api';
 import { ImageQueueItem } from './img-queue-item.model';
 import { ImageConfig } from './img-max.interfaces';
+import { finalize } from 'rxjs/operators';
 
 @Injectable()
 export class ImgMaxQueueService {
-
   private imageQueue: ImageQueueItem[];
   private resizeInProgress: boolean;
   private conversionProgress: BehaviorSubject<ConversionProgress>;
@@ -35,7 +35,6 @@ export class ImgMaxQueueService {
 
     if (!this.resizeInProgress) {
       this.resizeInProgress = true;
-      this.emitProgress();
       this.startConversion();
     }
     return imageQueueItem.resizeObservable;
@@ -54,17 +53,25 @@ export class ImgMaxQueueService {
   }
 
   private startConversion() {
+    this.emitProgress();
     const imageQueueItem = this.imageQueue.pop();
     const { maxHeight, maxWidth, logExecutionTime } = imageQueueItem.imageConfiguration;
-    this.imgMaxPXSizeService.resizeImage(imageQueueItem.imageToResize, maxWidth, maxHeight, logExecutionTime).subscribe(imageResized => {
-      imageQueueItem.resizeSub = imageResized;
-      if (this.imageQueue.length) {
-        this.startConversion();
-      } else {
-        this.resizeInProgress = false;
-        this.imagesToConvert = 0;
-      }
-      this.emitProgress();
-    });
+    this.imgMaxPXSizeService
+      .resizeImage(imageQueueItem.imageToResize, maxWidth, maxHeight, logExecutionTime)
+      .pipe(
+        finalize(() => {
+          if (this.imageQueue.length) {
+            this.startConversion();
+          } else {
+            this.resizeInProgress = false;
+            this.emitProgress();
+            this.imagesToConvert = 0;
+          }
+        })
+      )
+      .subscribe({
+        next: imageResized => (imageQueueItem.resizeSub = imageResized),
+        error: error => (imageQueueItem.resizeSubError = error)
+      });
   }
 }
