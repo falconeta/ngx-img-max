@@ -1,6 +1,6 @@
 {
   "name": "ngx-img-max",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "dependencies": {
     "exif-js": "^2.3.0",
     "ng-pica": "^8.0.0",
