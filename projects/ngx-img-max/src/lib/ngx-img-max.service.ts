@@ -1,13 +1,17 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { ImgMaxSizeService } from './img-max-size.service';
-import { ImgMaxPXSizeService } from './img-maxpx-size.service';
 import { ImgExifService } from './img-exif.service';
+import { ImgMaxQueueService } from './img-max-queue.service';
 
+export interface ConversionProgress {
+  percent: number;
+  isActive: boolean;
+}
 @Injectable()
 export class NgxImgMaxService {
-  constructor(private imgMaxSizeService: ImgMaxSizeService, private imgMaxPXSizeService: ImgMaxPXSizeService, private imageExifService: ImgExifService) {
-    console.log('NGX-IMG-MAX started... version 0.0.7');
+  constructor(private imgMaxSizeService: ImgMaxSizeService, private imageExifService: ImgExifService, private imgMaxQueueService: ImgMaxQueueService) {
+    console.log('NGX-IMG-MAX started... version 0.0.8');
   }
 
   public compress(files: File[], maxSizeInMB: number, ignoreAlpha: boolean = false, logExecutionTime: boolean = false): Observable<any> {
@@ -25,19 +29,8 @@ export class NgxImgMaxService {
     return compressedFileSubject.asObservable();
   }
 
-  public resize(files: File[], maxWidth: number, maxHeight: number, logExecutionTime: boolean = false): Observable<any> {
-    const resizedFileSubject = new Subject<any>();
-    files.forEach(file => {
-      this.resizeImage(file, maxWidth, maxHeight, logExecutionTime).subscribe(
-        value => {
-          resizedFileSubject.next(value);
-        },
-        error => {
-          resizedFileSubject.error(error);
-        }
-      );
-    });
-    return resizedFileSubject.asObservable();
+  public getConversionProgress(): Observable<ConversionProgress> {
+    return this.imgMaxQueueService.getConversionProgress();
   }
 
   public compressImage(file: File, maxSizeInMB: number, ignoreAlpha: boolean = false, logExecutionTime: boolean = false): Observable<any> {
@@ -45,7 +38,7 @@ export class NgxImgMaxService {
   }
 
   public resizeImage(file: File, maxWidth: number, maxHeight: number, logExecutionTime: boolean = false): Observable<File> {
-    return this.imgMaxPXSizeService.resizeImage(file, maxWidth, maxHeight, logExecutionTime);
+    return this.imgMaxQueueService.addImageToResizeInQueue(file, maxWidth, maxHeight, logExecutionTime);
   }
 
   public getEXIFOrientedImage(image: HTMLImageElement): Promise<HTMLImageElement> {
