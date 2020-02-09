@@ -7,9 +7,7 @@ import { NgxPicaModule } from 'ng-pica';
 import { ImgMaxQueueService } from './img-max-queue.service';
 
 @NgModule({
-  declarations: [],
   imports: [NgxPicaModule],
-  exports: [],
   providers: [ImgMaxPXSizeService, ImgMaxSizeService, ImgExifService, NgxImgMaxService, ImgMaxQueueService]
 })
-export class NgxImgMaxModule {}
+export class NgxImgMaxModule { }
