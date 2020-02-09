@@ -1,31 +1,31 @@
 import { Injectable } from '@angular/core';
-var EXIF = require('exif-js');
+let EXIF = require('exif-js');
 
 @Injectable()
 export class ImgExifService {
   public getOrientedImage(image: HTMLImageElement): Promise<HTMLImageElement> {
-    let result: Promise<HTMLImageElement> = new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       let img: any;
 
       if (!EXIF) {
         EXIF = {};
-        EXIF.getData = function(img, callback) {
+        EXIF.getData = (img, callback) => {
           callback.call(image);
           return true;
         };
         EXIF.getTag = () => false;
       }
       EXIF.getData(image, () => {
-        let orientation = EXIF.getTag(image, 'Orientation');
+        const orientation = EXIF.getTag(image, 'Orientation');
 
         if (orientation != 1) {
-          let canvas: HTMLCanvasElement = document.createElement('canvas'),
-            ctx: CanvasRenderingContext2D = <CanvasRenderingContext2D>canvas.getContext('2d'),
-            cw: number = image.width,
-            ch: number = image.height,
-            cx: number = 0,
-            cy: number = 0,
-            deg: number = 0;
+          const canvas: HTMLCanvasElement = document.createElement('canvas');
+          const ctx: CanvasRenderingContext2D = canvas.getContext('2d');
+          let cw: number = image.width;
+          let ch: number = image.height;
+          let cx = 0;
+          let cy = 0;
+          let deg = 0;
           switch (orientation) {
             case 3:
             case 4:
@@ -54,7 +54,7 @@ export class ImgExifService {
           canvas.width = cw;
           canvas.height = ch;
           if ([2, 4, 5, 7].indexOf(orientation) > -1) {
-            //flip image
+            // flip image
             ctx.translate(cw, 0);
             ctx.scale(-1, 1);
           }
@@ -63,7 +63,7 @@ export class ImgExifService {
           img = document.createElement('img');
           img.width = cw;
           img.height = ch;
-          img.addEventListener('load', function() {
+          img.addEventListener('load', () => {
             resolve(img);
           });
           img.src = canvas.toDataURL('image/png');
@@ -72,6 +72,5 @@ export class ImgExifService {
         }
       });
     });
-    return result;
   }
 }
