@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, Subject, throwError } from 'rxjs';
 import { take, finalize } from 'rxjs/operators';
 
-import { NgxPicaService, NgxPicaResizeOptionsInterface } from 'ng-pica';
+import { NgxPicaService, NgxPicaResizeOptionsInterface } from 'ngx-pica-wrapper';
 import { ImgExifService } from './img-exif.service';
 
 export interface ImageData {

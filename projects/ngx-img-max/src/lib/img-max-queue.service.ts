@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { ImgMaxPXSizeService } from './img-maxpx-size.service';
-import { ConversionProgress } from '../public-api';
 import { ImageQueueItem } from './img-queue-item.model';
 import { ImageConfig } from './img-max.interfaces';
 import { finalize } from 'rxjs/operators';
+import { ConversionProgress } from './ngx-img-max.service';
 
 @Injectable()
 export class ImgMaxQueueService {

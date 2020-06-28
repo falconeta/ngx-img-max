@@ -4,11 +4,10 @@
   "lib": {
     "entryFile": "src/public-api.ts",
     "umdModuleIds": {
-      "ng-pica": "ng-pica"
+      "ngx-pica-wrapper": "ngx-pica-wrapper"
     }
   },
   "whitelistedNonPeerDependencies": [
-    "ngx-pica",
     "pica",
     "exif-js"
   ]

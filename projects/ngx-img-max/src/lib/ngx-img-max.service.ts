@@ -11,7 +11,7 @@ export interface ConversionProgress {
 @Injectable()
 export class NgxImgMaxService {
   constructor(private imgMaxSizeService: ImgMaxSizeService, private imageExifService: ImgExifService, private imgMaxQueueService: ImgMaxQueueService) {
-    console.log('NGX-IMG-MAX started... version 0.0.8');
+    console.log('NGX-IMG-MAX started... version 0.0.12');
   }
 
   public compress(files: File[], maxSizeInMB: number, ignoreAlpha: boolean = false, logExecutionTime: boolean = false): Observable<any> {
